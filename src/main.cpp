@@ -8,6 +8,51 @@ File file;
 String index_html = "";
 ApplicationState appState;
 
+
+
+void setup(){
+  setlocale(LC_ALL, "de_DE.UTF-8");
+  // Serial port for debugging purposes
+  Serial.begin(9600);
+  Serial.setDebugOutput(true);
+
+  checkI2CStatus(I2CADDRESS, &bme);
+
+  if(!LittleFS.begin()){
+    Serial.println("An Error has occurred while mounting LittleFS");
+    return;
+  }
+
+  file = LittleFS.open("data.csv", "w");
+  if(!file){
+    Serial.println("Failed to open file for writing");
+    return;
+  }
+
+  loadHTMLPage("/index.html");
+
+  initAccessPoint(IPAddress(1,1,1,1), IPAddress(1,1,1,1), IPAddress(255,255,255,0), "WasserRakete");
+
+  initWebSocket();
+  // Start server
+  server.begin();
+}
+
+void loop() {
+  SensorData data = {};
+  data.pressure = bme.readPressure() / 100.0; //pressure in hPa
+  data.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA); //in m
+  data.temperature = bme.readTemperature(); // in °C
+  sendDataToClient(data);
+  storeData(data, appState);
+  ws.cleanupClients();
+  delay(DELAY);
+}
+
+
+//--------------------------------------------------------------------
+
+
 void loadHTMLPage(String fileName){
   File htmlFile = LittleFS.open(fileName, "r");
   
@@ -99,41 +144,12 @@ void initAccessPoint(const IPAddress& localIP, const IPAddress& gatewayIP, const
   WiFi.softAP(ssid);
 }
 
-void setup(){
-  setlocale(LC_ALL, "de_DE.UTF-8");
-  // Serial port for debugging purposes
-  Serial.begin(9600);
-  Serial.setDebugOutput(true);
-
-  checkI2CStatus(I2CADDRESS, &bme);
-
-  if(!LittleFS.begin()){
-    Serial.println("An Error has occurred while mounting LittleFS");
-    return;
+int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme){
+  Serial.printf("Checking for sensor at addr: 0x%x \n", addr);
+  bool status = bme->begin(I2CADDRESS, &Wire);  
+  if (!status) {
+    Serial.println("No sensor found! Check wiring!");
+    return -1;  
   }
-
-  file = LittleFS.open("data.csv", "w");
-  if(!file){
-    Serial.println("Failed to open file for writing");
-    return;
-  }
-
-  loadHTMLPage("/index.html");
-
-  initAccessPoint(IPAddress(1,1,1,1), IPAddress(1,1,1,1), IPAddress(255,255,255,0), "WasserRakete");
-
-  initWebSocket();
-  // Start server
-  server.begin();
-}
-
-void loop() {
-  SensorData data = {};
-  data.pressure = bme.readPressure() / 100.0; //pressure in hPa
-  data.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA); //in m
-  data.temperature = bme.readTemperature(); // in °C
-  sendDataToClient(data);
-  storeData(data, appState);
-  ws.cleanupClients();
-  delay(DELAY);
+  return 0;
 }

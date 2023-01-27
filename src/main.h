@@ -30,15 +30,7 @@ void initWebSocket();
 void initAccessPoint(const IPAddress& localIP, const IPAddress& gatewayIP, const IPAddress& netmask, const String& ssid);
 
 
-int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme){
-  Serial.printf("Checking for sensor at addr: 0x%x \n", addr);
-  bool status = bme->begin(I2CADDRESS, &Wire);  
-  if (!status) {
-    Serial.println("No sensor found! Check wiring!");
-    return -1;  
-  }
-  return 0;
-}
+int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme);
 
 String processor(const String& var);
 
