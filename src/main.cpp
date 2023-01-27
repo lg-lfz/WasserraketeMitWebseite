@@ -1,4 +1,5 @@
 #include "main.h"
+
 Adafruit_BME280 bme;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -29,8 +30,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       }
       else{
         file = LittleFS.open("data.csv", "w");
+        file.print("Hoehe; Druck; Temp\n");
         Serial.println("File opened");
-         ws.textAll("{\"state\":\"start\"}");
+        ws.textAll("{\"state\":\"start\"}");
       }
     }
   }
@@ -98,6 +100,7 @@ void initAccessPoint(const IPAddress& localIP, const IPAddress& gatewayIP, const
 }
 
 void setup(){
+  setlocale(LC_ALL, "de_DE.UTF-8");
   // Serial port for debugging purposes
   Serial.begin(9600);
   Serial.setDebugOutput(true);

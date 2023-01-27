@@ -6,6 +6,7 @@
 #include <Adafruit_BME280.h>
 #include <stdio.h>
 #include <string.h>
+#include <locale.h>
 
 #define SCL_PIN D1
 #define SDA_PIN D2
