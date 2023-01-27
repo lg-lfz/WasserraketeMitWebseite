@@ -1,7 +1,5 @@
 # Wasserrakete mit File (.csv) download im Browser
 
-[TOC]
-
 
 ## Installation 
 
@@ -58,7 +56,7 @@ Referenz: [Microsoft Forum](https://techcommunity.microsoft.com/t5/excel/decimal
 3. `Aus Datei`
 4. `Aus CSV`
 5. csv Datei auswählen
-6. `Laden in..` auswählen um die Daten in dem aktuellen Tabellenblatt einzufügen. `Laden`fügt eine neue Tabellenseite hinzu
+6. `Laden in..` auswählen um die Daten in dem aktuellen Tabellenblatt einzufügen. `Laden` fügt eine neue Tabellenseite hinzu
 
 ## Pinout
 
@@ -66,11 +64,11 @@ Referenz: [Microsoft Forum](https://techcommunity.microsoft.com/t5/excel/decimal
 
 Der BME280 ist ein Temperatur-, Luftdruck- und Luftfeuchtigkeitssensor.
 
-![BME280 Pinout - Temperature Humidity Barometric Pressure Sensor](https://lastminuteengineers.b-cdn.net/wp-content/uploads/arduino/BME280-Pinout-Temperature-Humidity-Barometric-Pressure-Sensor.png)
+![BME280 Pinout - Temperature Humidity Barometric Pressure Sensor](assets/BME280-Pinout-Temperature-Humidity-Barometric-Pressure-Sensor.png)
 
 ### Arduino ESP8266
 
-![Arduino ESP8266 Pinout](../DatasheetAndImages/ESP_Pinout.png)
+![Arduino ESP8266 Pinout](assets/ESP_Pinout.png)
 
 ### Verbindung
 
