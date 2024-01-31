@@ -13,7 +13,7 @@ Verwendete Bibliotheken:
 
 ## Beschreibung
 
-Der ESP8266 macht ein WLAN Netzwerk mit dem Namen `Wasserrakete` auf. Über die IP Adresse [1.1.1.1](http://1.1.1.1) auf Port `80` kann man auf eine Website zugreifen, über die man die aktuellen Messwerte sehen kann. Zusätzlich kann man eine Messung starten und wieder beenden. Nach dem Beenden wird automatisch eine `.csv`-Datei mit den gemessenen Werten herunter geladen.
+Der ESP8266 macht ein WLAN Netzwerk mit dem Namen `Wasserrakete` auf. Über die IP Adresse [10.10.10.10](http://10.10.10.10) auf Port `80` kann man auf eine Website zugreifen, über die man die aktuellen Messwerte sehen kann. Zusätzlich kann man eine Messung starten und wieder beenden. Nach dem Beenden wird automatisch eine `.csv`-Datei mit den gemessenen Werten herunter geladen.
 
 ### Import der csv-Datei in Excel
 
