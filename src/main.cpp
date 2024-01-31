@@ -31,7 +31,7 @@ void setup(){
 
   loadHTMLPage("/index.html");
 
-  initAccessPoint(IPAddress(10,10,10,10), IPAddress(10,10,10,10), IPAddress(255,255,255,0), "WasserRakete");
+  initAccessPoint(IPAddress(10,10,10,10), IPAddress(10,10,10,10), IPAddress(255,255,255,0), "WasserRakete" + WiFi.macAddress());
 
   initWebSocket();
   // Start server
