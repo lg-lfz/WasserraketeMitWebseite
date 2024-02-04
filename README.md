@@ -10,6 +10,21 @@ Verwendete Bibliotheken:
 | ESPAsyncWebserver | https://github.com/me-no-dev/ESPAsyncWebServer?utm_source=platformio&utm_medium=piohome |
 | Adafruit_BME280_Library | https://github.com/adafruit/Adafruit_BME280_Library?utm_source=platformio&utm_medium=piohome |
 
+## Upload des Programms auf einen neuen ESP
+
+Das Programm nutzt LittleFS um die index.html Datei auf dem ESP zu speichern. Über LittleFS können Dateien auf dem ESP abgelegt werden, ähnlich einem USB Stick. Wichtig hierbei ist, dass der Upload der Dateien **NICHT** beim Upload des Arduino Programms erfolgt. Der Upload der index.html Datei muss manuell angestoßen werden. Wie dies geht, ist hier beschrieben: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin
+
+Am besten wird für den Upload der index.html (für das LittlsFS) die Arduino IDE 1 oder 2 verwendet. Die Verwendung von VS Code wurde nicht getestet.
+
+Kurz zusammengefasst. Es muss eine `.jar` Datei heruntergeladen und an einem bestimmten Pfad entpackt werden. Der Pfad lautet:
+```bash
+<SketchbookPfad>/tools/ESP8266LittleFS/tool/esp8266littlefs.jar
+```
+Den Sketchbookpfad bekommt man über die Einstellungen der Arduino IDE raus (Ctrl+,). Es ist der Ordner, in dem sich default mäßig alle Arduino Sketches befinden.
+
+Arduino IDE Neustarten. Ordner des Wasserraketensketchs öffnen. In diesem Ordner leigt ein weiterer Ordner namens data. Nun kann in der Arduino IDE über Tools > ESP8266 LittleFS Data Upload der gesamte Inhalt des data Ordners hochgeladen werden.
+
+Falls dies nicht gemacht wird, so wird eine leere / weiße Website angezeigt.
 
 ## Beschreibung
 
