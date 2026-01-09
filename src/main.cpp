@@ -13,7 +13,7 @@ ApplicationState appState;
 void setup(){
   setlocale(LC_ALL, "de_DE.UTF-8");
   // Serial port for debugging purposes
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.setDebugOutput(true);
 
   checkI2CStatus(I2CADDRESS, &bme);
@@ -22,17 +22,26 @@ void setup(){
     Serial.println("An Error has occurred while mounting LittleFS");
     return;
   }
+  else
+  {
+    Serial.println("LittleFS.Beginn work successfully...");
+  }
 
   file = LittleFS.open("data.csv", "w");
   if(!file){
     Serial.println("Failed to open file for writing");
     return;
   }
+  else
+  {
+    Serial.println("Open file for writing works successfully...");
+  }
 
-  loadHTMLPage("/index.html");
+  //loadHTMLPage("/index.html");
 
   initAccessPoint(IPAddress(10,10,10,10), IPAddress(10,10,10,10), IPAddress(255,255,255,0), "WasserRakete" + WiFi.macAddress());
 
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
   initWebSocket();
   // Start server
   server.begin();
@@ -59,6 +68,10 @@ void loadHTMLPage(String fileName){
   if(htmlFile){
     index_html = htmlFile.readString();
     htmlFile.close();
+  }
+  else
+  {
+    Serial.println("Read the HTML file failed...");
   }
 }
 
@@ -97,6 +110,7 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
         break;
       case WS_EVT_PONG:
       case WS_EVT_ERROR:
+      case WS_EVT_PING:
         break;
   }
 }

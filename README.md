@@ -14,7 +14,12 @@ Verwendete Bibliotheken:
 
 Das Programm nutzt LittleFS um die index.html Datei auf dem ESP zu speichern. Über LittleFS können Dateien auf dem ESP abgelegt werden, ähnlich einem USB Stick. Wichtig hierbei ist, dass der Upload der Dateien **NICHT** beim Upload des Arduino Programms erfolgt. Der Upload der index.html Datei muss manuell angestoßen werden. Wie dies geht, ist hier beschrieben: https://github.com/earlephilhower/arduino-esp8266littlefs-plugin
 
-Am besten wird für den Upload der index.html (für das LittlsFS) die Arduino IDE 1 oder 2 verwendet. Die Verwendung von VS Code wurde nicht getestet.
+Bei PlattfromIO kann man das data-Verzeichnis einfach über die PlatformIO CLI hochladen:
+
+```bash
+pio run -e nodemcu -t uploadfs
+```
+Der Parameter -e gibt an welches Board - siehe PlatformIO.ini.
 
 Kurz zusammengefasst. Es muss eine `.jar` Datei heruntergeladen und an einem bestimmten Pfad entpackt werden. Der Pfad lautet:
 ```bash
@@ -28,7 +33,7 @@ Falls dies nicht gemacht wird, so wird eine leere / weiße Website angezeigt.
 
 ## Beschreibung
 
-Der ESP8266 macht ein WLAN Netzwerk mit dem Namen `Wasserrakete` auf. Über die IP Adresse [10.10.10.10](http://10.10.10.10) auf Port `80` kann man auf eine Website zugreifen, über die man die aktuellen Messwerte sehen kann. Zusätzlich kann man eine Messung starten und wieder beenden. Nach dem Beenden wird automatisch eine `.csv`-Datei mit den gemessenen Werten herunter geladen.
+Der ESP8266 macht ein WLAN Netzwerk mit dem Namen `WasserraketeXX:XX:XX:XX:XX:XX` auf. Über die IP Adresse [10.10.10.10](http://10.10.10.10) auf Port `80` kann man auf eine Website zugreifen, über die man die aktuellen Messwerte sehen kann. Zusätzlich kann man eine Messung starten und wieder beenden. Nach dem Beenden wird automatisch eine `.csv`-Datei mit den gemessenen Werten herunter geladen.
 
 ### Import der csv-Datei in Excel
 

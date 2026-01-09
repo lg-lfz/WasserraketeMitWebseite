@@ -38,5 +38,5 @@ void sendDataToClient(const SensorData& data);
 
 void storeData(const SensorData& data, const ApplicationState& appState);
 
-void loadHTMLPage(String fileName);
+//void loadHTMLPage(String fileName);
 
