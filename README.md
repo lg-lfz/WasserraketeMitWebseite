@@ -90,14 +90,14 @@ Der BME280 ist ein Temperatur-, Luftdruck- und Luftfeuchtigkeitssensor.
 
 ![Arduino ESP8266 Pinout](assets/ESP_Pinout.png)
 
-### Verbindung
+### Verbindung BME280 an d1_mini / nodemcuv2
 
-| BME280 | ESP8266 |
-| ------ | ------- |
-| VCC    | 3.3 V   |
-| GND    | GND     |
-| SCL    | D1      |
-| SDA    | D2      |
+| BME280 | d1_mini | nodemcuv2 |
+| ------ | ------- | --------- |
+| VCC    | 3.3 V   | 3.3 V     |
+| GND    | GND     | GND       |
+| SCL    | D1      | GPIO5     |
+| SDA    | D2      | GPIO4     |
 
 
 
