@@ -86,9 +86,13 @@ Der BME280 ist ein Temperatur-, Luftdruck- und Luftfeuchtigkeitssensor.
 
 ![BME280 Pinout - Temperature Humidity Barometric Pressure Sensor](assets/BME280-Pinout-Temperature-Humidity-Barometric-Pressure-Sensor.png)
 
-### Arduino ESP8266
+### D1 Mini (ESP8266)
 
-![Arduino ESP8266 Pinout](assets/ESP_Pinout.png)
+![D1 mini Pinout](assets/d1_mini_pinout.png)
+
+### NodeMCUv2 (ESP8266)
+
+![NodeMCUv2 Pinout](assets/nodemcuv2_pinout.png)
 
 ### Verbindung BME280 an d1_mini / nodemcuv2
 
