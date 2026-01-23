@@ -14,7 +14,7 @@
 #define I2CADDRESS 0x76
 
 #define SEALEVELPRESSURE_HPA 1013.25
-#define DELAY 50
+#define DELAY 100 // 10 times per second
 
 struct SensorData
 {
