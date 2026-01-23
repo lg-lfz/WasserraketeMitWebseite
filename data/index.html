@@ -75,6 +75,7 @@
         <h2 class="pressure">Pressure: <span id="pressure">0.0</span> hPa</h2>
         <h2 class="altitude">Altitude: <span id="altitude">0.0</span> m</h2>
         <h2 class="temperature">Temperature: <span id="temperature">0.0</span> &deg;C</h2>
+        <h2 class="realData">BMP-Sensor: <span id="realData">fake</span></h2>
         <p class="state">State: <span id="state">not recording...</span></p>
         <p><button id="Startbutton" class="button">Start</button></p>
       </div>
@@ -115,6 +116,12 @@
           document.getElementById("temperature").innerHTML = data.temperature.toFixed(2);
           document.getElementById("altitude").innerHTML = data.altitude.toFixed(2);
           document.getElementById("pressure").innerHTML = data.pressure.toFixed(2);
+          if (data.realData) {
+            document.getElementById("realData").innerHTML = "BMP280";
+          }
+          else {
+            document.getElementById("realData").innerHTML = "Fake";
+          }
         }
       }
       

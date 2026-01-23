@@ -21,6 +21,7 @@ struct SensorData
   float pressure;
   float altitude;
   float temperature;
+  bool realData;
 };
 
 struct ApplicationState

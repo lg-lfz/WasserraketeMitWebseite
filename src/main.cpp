@@ -53,6 +53,7 @@ void loop()
   dnsServer.processNextRequest();
 
   SensorData data = {};
+  data.realData = bmpReadyStatus;
   if (bmpReadyStatus)
   {
     data.pressure = bme.readPressure() / 100.0;             // pressure in hPa
@@ -173,14 +174,15 @@ String processor(const String &var)
 
 void sendDataToClient(const SensorData &data)
 {
-  ws.printfAll("{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f}", data.altitude, data.pressure, data.temperature);
+  ws.printfAll("{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"realData\": %s}", 
+    data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false");
 }
 
 void storeData(const SensorData &data, const ApplicationState &appState)
 {
   if (appState.dataRecording)
   {
-    if (file.printf("%0.2f; %0.2f; %0.2f\n", data.altitude, data.pressure, data.temperature))
+    if (file.printf("%0.2f; %0.2f; %0.2f; %s\n", data.altitude, data.pressure, data.temperature, data.realData))
     {
     }
     else
