@@ -163,7 +163,7 @@ void initWebSocket()
             { request->send(200, "text/plain", "Microsoft Connect Test"); });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send_P(200, "text/html", index_html.c_str(), processor); });
+            { request->send(LittleFS, "/index.html", "text/html", false, processor); });
 
   server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request)
             {
@@ -186,7 +186,10 @@ void initWebSocket()
 
 String processor(const String &var)
 {
-  Serial.println(var);
+  if (var == "MAC")
+  {
+    return WiFi.macAddress();
+  }
   return String();
 }
 
