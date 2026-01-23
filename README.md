@@ -88,7 +88,7 @@ Der BME280 ist ein Temperatur-, Luftdruck- und Luftfeuchtigkeitssensor.
 
 ### D1 Mini (ESP8266)
 
-![D1 mini Pinout](assets/d1_mini_pinout.png)
+![D1 mini Pinout](assets/d1mini_pinout.png)
 
 ### NodeMCUv2 (ESP8266)
 
