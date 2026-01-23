@@ -73,3 +73,7 @@ body {
 .state.recording {
   color: #e74c3c;
 }
+
+.rocket {
+  font-size: 6rem;
+}
