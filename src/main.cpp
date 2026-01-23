@@ -146,6 +146,9 @@ void initWebSocket()
 {
   ws.onEvent(onEvent);
   server.addHandler(&ws);
+  
+  // Limitiere auf 2 Clients für Stabilität
+  // ws.setMaxClients(2);  // Optional - auskommentieren wenn mehr Clients nötig
 
   // Apple Captive Portal Check
   server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -189,26 +192,32 @@ String processor(const String &var)
 
 void sendDataToClient(const SensorData &data)
 {
-  // Nicht senden wenn keine Clients verbunden
-  if (ws.count() == 0)
+  // Früh raus wenn keine Clients
+  if (ws.count() == 0 || ws.getClients().empty())
   {
     return;
   }
 
   // Buffer einmal erstellen
   char buffer[128];
-  snprintf(buffer, sizeof(buffer), 
-    "{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"realData\": %s, \"recording\": %s}", 
+  int len = snprintf(buffer, sizeof(buffer), 
+    "{\"altitude\":%.2f,\"pressure\":%.2f,\"temperature\":%.2f,\"realData\":%s,\"recording\":%s}", 
     data.altitude, data.pressure, data.temperature, 
     data.realData ? "true" : "false", 
     appState.dataRecording ? "true" : "false");
 
-  // Jeden Client einzeln ansprechen und prüfen
+  if (len <= 0 || len >= (int)sizeof(buffer))
+  {
+    return;  // Buffer overflow protection
+  }
+
+  // Clients einzeln, mit doppeltem Check
   for (auto& client : ws.getClients())
   {
-    if (client.status() == WS_CONNECTED)
+    if (client.status() == WS_CONNECTED && client.canSend())
     {
-      client.text(buffer);
+      client.text(buffer, len);
+      yield();  // Nach jedem Send kurz Luft holen
     }
   }
 }
