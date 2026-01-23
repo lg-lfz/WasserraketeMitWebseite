@@ -30,6 +30,7 @@ function onMessage(event) {
   document.getElementById("altitude").innerHTML = data.altitude.toFixed(2);
   document.getElementById("pressure").innerHTML = data.pressure.toFixed(2);
   document.getElementById("realData").innerHTML = data.realData ? "BMP280" : "Fake";
+  document.getElementById("clients").innerHTML = data.clients;
 
   // Recording-State updaten
   const button = document.getElementById("Startbutton");

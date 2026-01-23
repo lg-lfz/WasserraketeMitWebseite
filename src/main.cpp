@@ -199,12 +199,13 @@ void sendDataToClient(const SensorData &data)
   }
 
   // Buffer einmal erstellen
-  char buffer[128];
+  char buffer[150];
   int len = snprintf(buffer, sizeof(buffer), 
-    "{\"altitude\":%.2f,\"pressure\":%.2f,\"temperature\":%.2f,\"realData\":%s,\"recording\":%s}", 
+    "{\"altitude\":%.2f,\"pressure\":%.2f,\"temperature\":%.2f,\"realData\":%s,\"recording\":%s,\"clients\":%d}", 
     data.altitude, data.pressure, data.temperature, 
     data.realData ? "true" : "false", 
-    appState.dataRecording ? "true" : "false");
+    appState.dataRecording ? "true" : "false",
+    ws.count());
 
   if (len <= 0 || len >= (int)sizeof(buffer))
   {
