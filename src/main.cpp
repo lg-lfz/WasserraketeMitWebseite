@@ -61,6 +61,7 @@ void loop()
   sendDataToClient(data);
   storeData(data, appState);
   
+  yield();  // Gibt dem System Zeit für Netzwerk-Tasks
   delay(DELAY);
 }
 
@@ -99,7 +100,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
           file.close();
         }
         Serial.println("File closed");
-        ws.textAll("{\"state\":\"stop\"}");
       }
       else
       {
@@ -109,13 +109,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
         {
           file.print("Altitude; Pressure; Temp; RealData\n");
           Serial.println("File opened");
-          ws.textAll("{\"state\":\"start\"}");
         }
         else
         {
           Serial.println("Failed to open file for writing");
-          appState.dataRecording = false;  // Zurücksetzen wenn File nicht geöffnet werden kann
-          ws.textAll("{\"state\":\"error\"}");
+          appState.dataRecording = false;
         }
       }
     }
@@ -196,8 +194,10 @@ void sendDataToClient(const SensorData &data)
     return;
   }
   
-  ws.printfAll("{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"realData\": %s}", 
-    data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false");
+  ws.printfAll("{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"realData\": %s, \"recording\": %s}", 
+    data.altitude, data.pressure, data.temperature, 
+    data.realData ? "true" : "false", 
+    appState.dataRecording ? "true" : "false");
 }
 
 void storeData(const SensorData &data, const ApplicationState &appState)
