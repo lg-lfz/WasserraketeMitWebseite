@@ -182,7 +182,7 @@ void storeData(const SensorData &data, const ApplicationState &appState)
 {
   if (appState.dataRecording)
   {
-    if (file.printf("%0.2f; %0.2f; %0.2f; %s\n", data.altitude, data.pressure, data.temperature, data.realData))
+    if (file.printf("%0.2f; %0.2f; %0.2f; %s\n", data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false"))
     {
     }
     else
