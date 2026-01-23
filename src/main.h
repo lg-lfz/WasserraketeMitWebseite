@@ -31,7 +31,7 @@ struct ApplicationState
 void initWebSocket();
 void initAccessPoint(const IPAddress &localIP, const IPAddress &gatewayIP, const IPAddress &netmask, const String &ssid);
 
-int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme);
+bool checkIfBmeIsReady(uint8_t addr, Adafruit_BME280 *bme);
 
 String processor(const String &var);
 

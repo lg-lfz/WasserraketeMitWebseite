@@ -1,6 +1,7 @@
 #include "main.h"
 
 Adafruit_BME280 bme;
+bool bmpReadyStatus = false;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 DNSServer dnsServer;
@@ -16,7 +17,7 @@ void setup()
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 
-  checkI2CStatus(I2CADDRESS, &bme);
+  bmpReadyStatus = checkIfBmeIsReady(I2CADDRESS, &bme);
 
   if (!LittleFS.begin())
   {
@@ -52,9 +53,18 @@ void loop()
   dnsServer.processNextRequest();
 
   SensorData data = {};
-  data.pressure = bme.readPressure() / 100.0;             // pressure in hPa
-  data.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA); // in m
-  data.temperature = bme.readTemperature();               // in °C
+  if (bmpReadyStatus)
+  {
+    data.pressure = bme.readPressure() / 100.0;             // pressure in hPa
+    data.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA); // in m
+    data.temperature = bme.readTemperature();               // in °C
+  }
+  else
+  {
+    data.temperature = 21 + random(-50, 50) / 10.0;
+    data.pressure = 1013.25 + sin(millis() / 10000.0) * 5;
+    data.altitude = 450.0 + random(-50, 50) / 10.0;
+  }
   sendDataToClient(data);
   storeData(data, appState);
   ws.cleanupClients();
@@ -195,14 +205,14 @@ void initAccessPoint(const IPAddress &localIP, const IPAddress &gatewayIP, const
   Serial.println("DNS server started");
 }
 
-int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme)
+bool checkIfBmeIsReady(uint8_t addr, Adafruit_BME280 *bme)
 {
   Serial.printf("Checking for sensor at addr: 0x%x \n", addr);
   bool status = bme->begin(I2CADDRESS, &Wire);
   if (!status)
   {
     Serial.println("No sensor found! Check wiring!");
-    return -1;
+    return false;
   }
-  return 0;
+  return true;
 }
