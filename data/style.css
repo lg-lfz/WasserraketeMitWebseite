@@ -74,6 +74,19 @@ body {
   color: #e74c3c;
 }
 
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
 .rocket {
-  font-size: 6rem;
+  font-size: 5rem;
+}
+
+.qrcode {
+  width: 80px;
+  height: 80px;
 }

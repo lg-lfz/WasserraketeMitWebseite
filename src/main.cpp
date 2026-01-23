@@ -13,7 +13,6 @@ ApplicationState appState;
 void setup()
 {
   setlocale(LC_ALL, "de_DE.UTF-8");
-  // Serial port for debugging purposes
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 
@@ -25,16 +24,13 @@ void setup()
     return;
   }
   Serial.println("LittleFS.begin() works successfully...");
-
-  // File wird NICHT hier geöffnet, sondern erst beim Start der Aufnahme
-
   initAccessPoint(IPAddress(10, 10, 10, 10), IPAddress(10, 10, 10, 10), IPAddress(255, 255, 255, 0), "Rocket-" + WiFi.macAddress());
 
-  // Statische Dateien (CSS, JS) - aber NICHT index.html
   server.serveStatic("/style.css", LittleFS, "/style.css");
   server.serveStatic("/script.js", LittleFS, "/script.js");
   server.serveStatic("/favicon.ico", LittleFS, "/favicon.ico");
-  
+  server.serveStatic("/10-10-10-10-qr-code.svg", LittleFS, "/10-10-10-10-qr-code.svg");
+
   initWebSocket();
   // Start server
   server.begin();
@@ -43,10 +39,9 @@ void setup()
 void loop()
 {
   dnsServer.processNextRequest();
-  
-  // cleanupClients ZUERST - entfernt disconnected clients bevor wir senden
+
   ws.cleanupClients();
-  yield();  // Zeit für Netzwerk-Stack
+  yield();
 
   SensorData data = {};
   data.realData = bmpReadyStatus;
@@ -57,20 +52,18 @@ void loop()
     data.temperature = bme.readTemperature();               // in °C
   }
   else
-  {
+  { // Faked data
     data.temperature = 21 + random(-50, 50) / 10.0;
     data.pressure = 1013.25 + sin(millis() / 10000.0) * 5;
     data.altitude = 450.0 + random(-50, 50) / 10.0;
   }
-  
+
   sendDataToClient(data);
   storeData(data, appState);
-  
-  yield();  // Gibt dem System Zeit für Netzwerk-Tasks
+
+  yield();
   delay(DELAY);
 }
-
-//--------------------------------------------------------------------
 
 void loadHTMLPage(String fileName)
 {
@@ -99,7 +92,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
       if (!appState.dataRecording)
       {
-        // Aufnahme stoppen
         if (file)
         {
           file.close();
@@ -108,7 +100,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
       }
       else
       {
-        // Aufnahme starten
         file = LittleFS.open("data.csv", "w");
         if (file)
         {
@@ -150,9 +141,9 @@ void initWebSocket()
 {
   ws.onEvent(onEvent);
   server.addHandler(&ws);
-  
-  // Limitiere auf 2 Clients für Stabilität
-  // ws.setMaxClients(2);  // Optional - auskommentieren wenn mehr Clients nötig
+
+  // Limit to 2 Clients for stability
+  // ws.setMaxClients(2);  // Optional
 
   // Apple Captive Portal Check
   server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -174,12 +165,12 @@ void initWebSocket()
 
   server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-      // Aufnahme stoppen falls aktiv
+      
       if (appState.dataRecording)
       {
         appState.dataRecording = false;
       }
-      // File sicher schließen
+      
       if (file)
       {
         file.close();
@@ -202,40 +193,36 @@ String processor(const String &var)
 
 void sendDataToClient(const SensorData &data)
 {
-  // Früh raus wenn keine Clients
   if (ws.count() == 0 || ws.getClients().empty())
   {
     return;
   }
 
-  // Buffer einmal erstellen
   char buffer[150];
-  int len = snprintf(buffer, sizeof(buffer), 
-    "{\"altitude\":%.2f,\"pressure\":%.2f,\"temperature\":%.2f,\"realData\":%s,\"recording\":%s,\"clients\":%d}", 
-    data.altitude, data.pressure, data.temperature, 
-    data.realData ? "true" : "false", 
-    appState.dataRecording ? "true" : "false",
-    ws.count());
+  int len = snprintf(buffer, sizeof(buffer),
+                     "{\"altitude\":%.2f,\"pressure\":%.2f,\"temperature\":%.2f,\"realData\":%s,\"recording\":%s,\"clients\":%d}",
+                     data.altitude, data.pressure, data.temperature,
+                     data.realData ? "true" : "false",
+                     appState.dataRecording ? "true" : "false",
+                     ws.count());
 
   if (len <= 0 || len >= (int)sizeof(buffer))
   {
-    return;  // Buffer overflow protection
+    return; // Buffer overflow protection
   }
 
-  // Clients einzeln, mit doppeltem Check
-  for (auto& client : ws.getClients())
+  for (auto &client : ws.getClients())
   {
     if (client.status() == WS_CONNECTED && client.canSend())
     {
       client.text(buffer, len);
-      yield();  // Nach jedem Send kurz Luft holen
+      yield();
     }
   }
 }
 
 void storeData(const SensorData &data, const ApplicationState &appState)
 {
-  // Nur schreiben wenn Aufnahme aktiv UND File gültig
   if (appState.dataRecording && file)
   {
     if (!file.printf("%0.2f; %0.2f; %0.2f; %s\n", data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false"))
