@@ -1,5 +1,4 @@
 #include "main.h"
-#include <DNSServer.h>
 
 Adafruit_BME280 bme;
 AsyncWebServer server(80);

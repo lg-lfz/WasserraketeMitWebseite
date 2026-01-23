@@ -2,6 +2,7 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <DNSServer.h>
 #include "LittleFS.h"
 #include <Adafruit_BME280.h>
 #include <stdio.h>
