@@ -1,8 +1,10 @@
 #include "main.h"
+#include <DNSServer.h>
 
 Adafruit_BME280 bme;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
+DNSServer dnsServer;
 
 File file;
 String index_html = "";
@@ -48,6 +50,8 @@ void setup(){
 }
 
 void loop() {
+  dnsServer.processNextRequest();
+  
   SensorData data = {};
   data.pressure = bme.readPressure() / 100.0; //pressure in hPa
   data.altitude = bme.readAltitude(SEALEVELPRESSURE_HPA); //in m
@@ -118,6 +122,22 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
 void initWebSocket() {
   ws.onEvent(onEvent);
   server.addHandler(&ws);
+
+  // Apple Captive Portal Check
+  server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/html", "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>");
+  });
+  
+  // Android Captive Portal Check (beide Varianten)
+  server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(204);
+  });
+
+  // Windows Captive Portal Check
+  server.on("/connecttest.txt", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(200, "text/plain", "Microsoft Connect Test");
+  });
+
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/html", index_html.c_str(), processor);
   });
@@ -156,6 +176,10 @@ void initAccessPoint(const IPAddress& localIP, const IPAddress& gatewayIP, const
   Serial.print("Soft-AP IP address = ");
   Serial.println(WiFi.softAPIP());
   WiFi.softAP(ssid);
+  
+  // DNS Server starten - leitet alle Domain-Anfragen auf den ESP32
+  dnsServer.start(53, "*", localIP);
+  Serial.println("DNS Server gestartet");
 }
 
 int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme){
