@@ -3,7 +3,7 @@
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <DNSServer.h>
-#include "LittleFS.h"
+#include <LittleFS.h>
 #include <Adafruit_BME280.h>
 #include <stdio.h>
 #include <string.h>
@@ -16,28 +16,25 @@
 #define SEALEVELPRESSURE_HPA 1013.25
 #define DELAY 50
 
-struct SensorData{
+struct SensorData
+{
   float pressure;
   float altitude;
   float temperature;
 };
 
-struct ApplicationState{
+struct ApplicationState
+{
   bool dataRecording;
 };
 
-
 void initWebSocket();
-void initAccessPoint(const IPAddress& localIP, const IPAddress& gatewayIP, const IPAddress& netmask, const String& ssid);
-
+void initAccessPoint(const IPAddress &localIP, const IPAddress &gatewayIP, const IPAddress &netmask, const String &ssid);
 
 int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme);
 
-String processor(const String& var);
+String processor(const String &var);
 
-void sendDataToClient(const SensorData& data);
+void sendDataToClient(const SensorData &data);
 
-void storeData(const SensorData& data, const ApplicationState& appState);
-
-//void loadHTMLPage(String fileName);
-
+void storeData(const SensorData &data, const ApplicationState &appState);
