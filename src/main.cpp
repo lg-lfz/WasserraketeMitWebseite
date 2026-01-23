@@ -30,7 +30,11 @@ void setup()
 
   initAccessPoint(IPAddress(10, 10, 10, 10), IPAddress(10, 10, 10, 10), IPAddress(255, 255, 255, 0), "Rocket-" + WiFi.macAddress());
 
-  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+  // Statische Dateien (CSS, JS) - aber NICHT index.html
+  server.serveStatic("/style.css", LittleFS, "/style.css");
+  server.serveStatic("/script.js", LittleFS, "/script.js");
+  server.serveStatic("/favicon.ico", LittleFS, "/favicon.ico");
+  
   initWebSocket();
   // Start server
   server.begin();
@@ -163,6 +167,9 @@ void initWebSocket()
             { request->send(200, "text/plain", "Microsoft Connect Test"); });
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+            { request->send(LittleFS, "/index.html", "text/html", false, processor); });
+
+  server.on("/index.html", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(LittleFS, "/index.html", "text/html", false, processor); });
 
   server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request)
