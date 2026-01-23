@@ -24,21 +24,9 @@ void setup()
     Serial.println("An error has occurred while mounting LittleFS");
     return;
   }
-  else
-  {
-    Serial.println("LittleFS.begin() works successfully...");
-  }
+  Serial.println("LittleFS.begin() works successfully...");
 
-  file = LittleFS.open("data.csv", "w");
-  if (!file)
-  {
-    Serial.println("Failed to open file for writing");
-    return;
-  }
-  else
-  {
-    Serial.println("Open file for writing works successfully...");
-  }
+  // File wird NICHT hier geöffnet, sondern erst beim Start der Aufnahme
 
   initAccessPoint(IPAddress(10, 10, 10, 10), IPAddress(10, 10, 10, 10), IPAddress(255, 255, 255, 0), "Rocket-" + WiFi.macAddress());
 
@@ -51,6 +39,9 @@ void setup()
 void loop()
 {
   dnsServer.processNextRequest();
+  
+  // cleanupClients ZUERST - entfernt disconnected clients bevor wir senden
+  ws.cleanupClients();
 
   SensorData data = {};
   data.realData = bmpReadyStatus;
@@ -66,9 +57,10 @@ void loop()
     data.pressure = 1013.25 + sin(millis() / 10000.0) * 5;
     data.altitude = 450.0 + random(-50, 50) / 10.0;
   }
+  
   sendDataToClient(data);
   storeData(data, appState);
-  ws.cleanupClients();
+  
   delay(DELAY);
 }
 
@@ -101,15 +93,30 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
 
       if (!appState.dataRecording)
       {
+        // Aufnahme stoppen
+        if (file)
+        {
+          file.close();
+        }
         Serial.println("File closed");
         ws.textAll("{\"state\":\"stop\"}");
       }
       else
       {
+        // Aufnahme starten
         file = LittleFS.open("data.csv", "w");
-        file.print("Altitude; Pressure; Temp\n");
-        Serial.println("File opened");
-        ws.textAll("{\"state\":\"start\"}");
+        if (file)
+        {
+          file.print("Altitude; Pressure; Temp; RealData\n");
+          Serial.println("File opened");
+          ws.textAll("{\"state\":\"start\"}");
+        }
+        else
+        {
+          Serial.println("Failed to open file for writing");
+          appState.dataRecording = false;  // Zurücksetzen wenn File nicht geöffnet werden kann
+          ws.textAll("{\"state\":\"error\"}");
+        }
       }
     }
   }
@@ -158,7 +165,16 @@ void initWebSocket()
 
   server.on("/download", HTTP_GET, [](AsyncWebServerRequest *request)
             {
-      file.close();
+      // Aufnahme stoppen falls aktiv
+      if (appState.dataRecording)
+      {
+        appState.dataRecording = false;
+      }
+      // File sicher schließen
+      if (file)
+      {
+        file.close();
+      }
       request->send(LittleFS, "data.csv", String(), true); });
 
   // Catch-All: Redirect all unknown requests to homepage
@@ -174,20 +190,24 @@ String processor(const String &var)
 
 void sendDataToClient(const SensorData &data)
 {
+  // Nicht senden wenn keine Clients verbunden
+  if (ws.count() == 0)
+  {
+    return;
+  }
+  
   ws.printfAll("{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"realData\": %s}", 
     data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false");
 }
 
 void storeData(const SensorData &data, const ApplicationState &appState)
 {
-  if (appState.dataRecording)
+  // Nur schreiben wenn Aufnahme aktiv UND File gültig
+  if (appState.dataRecording && file)
   {
-    if (file.printf("%0.2f; %0.2f; %0.2f; %s\n", data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false"))
+    if (!file.printf("%0.2f; %0.2f; %0.2f; %s\n", data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false"))
     {
-    }
-    else
-    {
-      Serial.println("- Write failed");
+      Serial.println("Write failed");
     }
   }
 }
