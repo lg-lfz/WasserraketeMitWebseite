@@ -20,12 +20,12 @@ void setup()
 
   if (!LittleFS.begin())
   {
-    Serial.println("An Error has occurred while mounting LittleFS");
+    Serial.println("An error has occurred while mounting LittleFS");
     return;
   }
   else
   {
-    Serial.println("LittleFS.Beginn work successfully...");
+    Serial.println("LittleFS.begin() works successfully...");
   }
 
   file = LittleFS.open("data.csv", "w");
@@ -76,7 +76,7 @@ void loadHTMLPage(String fileName)
   }
   else
   {
-    Serial.println("Read the HTML file failed...");
+    Serial.println("Reading the HTML file failed...");
   }
 }
 
@@ -98,7 +98,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
       else
       {
         file = LittleFS.open("data.csv", "w");
-        file.print("Hoehe; Druck; Temp\n");
+        file.print("Altitude; Pressure; Temp\n");
         Serial.println("File opened");
         ws.textAll("{\"state\":\"start\"}");
       }
@@ -136,7 +136,7 @@ void initWebSocket()
   server.on("/hotspot-detect.html", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(200, "text/html", "<HTML><HEAD><TITLE>Success</TITLE></HEAD><BODY>Success</BODY></HTML>"); });
 
-  // Android Captive Portal Check (beide Varianten)
+  // Android Captive Portal Check (both variants)
   server.on("/generate_204", HTTP_GET, [](AsyncWebServerRequest *request)
             { request->send(204); });
 
@@ -152,7 +152,7 @@ void initWebSocket()
       file.close();
       request->send(LittleFS, "data.csv", String(), true); });
 
-  // Catch-All: Alle unbekannten Anfragen → Redirect zur Startseite
+  // Catch-All: Redirect all unknown requests to homepage
   server.onNotFound([](AsyncWebServerRequest *request)
                     { request->redirect("http://10.10.10.10/"); });
 }
@@ -177,7 +177,7 @@ void storeData(const SensorData &data, const ApplicationState &appState)
     }
     else
     {
-      Serial.println("- Schreiben fehlgeschlagen");
+      Serial.println("- Write failed");
     }
   }
 }
@@ -186,15 +186,15 @@ void initAccessPoint(const IPAddress &localIP, const IPAddress &gatewayIP, const
 {
   if (!WiFi.softAPConfig(localIP, gatewayIP, netmask))
   {
-    Serial.println("WLAN Konfiguration nicht erfolgreich.");
+    Serial.println("WiFi configuration failed.");
   }
   Serial.print("Soft-AP IP address = ");
   Serial.println(WiFi.softAPIP());
   WiFi.softAP(ssid);
 
-  // DNS Server starten - leitet alle Domain-Anfragen auf den ESP32
+  // Start DNS server - redirects all domain requests to the ESP32
   dnsServer.start(53, "*", localIP);
-  Serial.println("DNS Server gestartet");
+  Serial.println("DNS server started");
 }
 
 int checkI2CStatus(uint8_t addr, Adafruit_BME280 *bme)
