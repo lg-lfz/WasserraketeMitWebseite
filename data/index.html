@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Wasserrakete</title>
+    <title>Water Rocket</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="data:," />
     <style>
@@ -65,20 +65,17 @@
         font-weight: bold;
       }
     </style>
-    <title>Wasserrakete</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="data:," />
   </head>
   <body>
     <div class="topnav">
-      <h1>Wasserrakete</h1>
+      <h1>Water Rocket</h1>
     </div>
     <div class="content">
       <div class="card">
-        <h2 class="pressure">Luftdruck: <span id="pressure">0.0</span> hPa</h2>
-        <h2 class="altitude">H&ouml;he: <span id="altitude">0.0</span>  m</h2>
-        <h2 class="temperature">Temperatur: <span id="temperature">0.0</span> &deg;C</h2>
-        <p class="state">state: <span id="state">no recording...</span></p>
+        <h2 class="pressure">Pressure: <span id="pressure">0.0</span> hPa</h2>
+        <h2 class="altitude">Altitude: <span id="altitude">0.0</span> m</h2>
+        <h2 class="temperature">Temperature: <span id="temperature">0.0</span> &deg;C</h2>
+        <p class="state">State: <span id="state">not recording...</span></p>
         <p><button id="Startbutton" class="button">Start</button></p>
       </div>
     </div>
@@ -110,7 +107,7 @@
           }
           else if(data.state == "stop"){
             document.getElementById("Startbutton").innerHTML = "Start";
-            document.getElementById("state").innerHTML = "no recording...";
+            document.getElementById("state").innerHTML = "not recording...";
             window.location.href = 'download';
           }
         }

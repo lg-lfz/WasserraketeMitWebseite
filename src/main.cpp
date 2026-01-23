@@ -39,9 +39,7 @@ void setup()
     Serial.println("Open file for writing works successfully...");
   }
 
-  // loadHTMLPage("/index.html");
-
-  initAccessPoint(IPAddress(10, 10, 10, 10), IPAddress(10, 10, 10, 10), IPAddress(255, 255, 255, 0), "WasserRakete" + WiFi.macAddress());
+  initAccessPoint(IPAddress(10, 10, 10, 10), IPAddress(10, 10, 10, 10), IPAddress(255, 255, 255, 0), "Rocket-" + WiFi.macAddress());
 
   server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
   initWebSocket();
