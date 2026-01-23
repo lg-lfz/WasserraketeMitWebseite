@@ -42,6 +42,7 @@ void loop()
   
   // cleanupClients ZUERST - entfernt disconnected clients bevor wir senden
   ws.cleanupClients();
+  yield();  // Zeit für Netzwerk-Stack
 
   SensorData data = {};
   data.realData = bmpReadyStatus;
@@ -193,11 +194,23 @@ void sendDataToClient(const SensorData &data)
   {
     return;
   }
-  
-  ws.printfAll("{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"realData\": %s, \"recording\": %s}", 
+
+  // Buffer einmal erstellen
+  char buffer[128];
+  snprintf(buffer, sizeof(buffer), 
+    "{\"altitude\": %0.2f, \"pressure\": %0.2f, \"temperature\": %0.2f, \"realData\": %s, \"recording\": %s}", 
     data.altitude, data.pressure, data.temperature, 
     data.realData ? "true" : "false", 
     appState.dataRecording ? "true" : "false");
+
+  // Jeden Client einzeln ansprechen und prüfen
+  for (auto& client : ws.getClients())
+  {
+    if (client.status() == WS_CONNECTED)
+    {
+      client.text(buffer);
+    }
+  }
 }
 
 void storeData(const SensorData &data, const ApplicationState &appState)
