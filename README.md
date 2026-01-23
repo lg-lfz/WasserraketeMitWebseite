@@ -1,5 +1,7 @@
 # Wasserrakete mit File (.csv) download im Browser
 
+![Screenshot](assets/screenshot.jpg)
+
 ## Installation 
 
 Verwendete Bibliotheken:
