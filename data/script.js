@@ -2,6 +2,8 @@ var gateway = `ws://${window.location.hostname}/ws`;
 var websocket;
 var myTogglePending = false;
 var wasRecording = false;
+var lastMessageTime = Date.now();
+var heartbeatInterval;
 
 window.addEventListener('load', onLoad);
 
@@ -15,14 +17,25 @@ function initWebSocket() {
 
 function onOpen(event) {
   console.log('Connection opened');
+  lastMessageTime = Date.now();
+  
+  clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(function() {
+    if (Date.now() - lastMessageTime > 5000) {
+      console.log('No data for 5s - reconnecting...');
+      websocket.close();
+    }
+  }, 3000);
 }
 
 function onClose(event) {
   console.log('Connection closed');
+  clearInterval(heartbeatInterval);
   setTimeout(initWebSocket, 2000);
 }
 
 function onMessage(event) {
+  lastMessageTime = Date.now();
   const data = JSON.parse(event.data);
 
   document.getElementById("temperature").innerHTML = data.temperature.toFixed(2);
