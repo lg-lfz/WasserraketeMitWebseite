@@ -6,6 +6,7 @@ AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 DNSServer dnsServer;
 unsigned long lastSerialPrint = 0;
+FSInfo fs_info;
 
 File file;
 String index_html = "";
@@ -50,12 +51,17 @@ void setup()
   initWebSocket();
   server.begin();
   yield();
+  LittleFS.info(fs_info);
   Serial.println("------ Board Info ------");
   Serial.printf("Board: %s\n", BOARD_TYPE);
   Serial.printf("Chip ID: %08X\n", ESP.getChipId());
   Serial.printf("Flash Size: %d KB\n", ESP.getFlashChipSize() / 1024);
   Serial.printf("CPU Freq: %d MHz\n", ESP.getCpuFreqMHz());
   Serial.printf("MAC: %s\n", WiFi.macAddress().c_str());
+  Serial.printf("LittleFS Space: Total: %d KB | Used: %d KB | Free: %d KB\n",
+    fs_info.totalBytes / 1024,
+    fs_info.usedBytes / 1024,
+    (fs_info.totalBytes - fs_info.usedBytes) / 1024);
   Serial.println("------------------------");
 }
 
@@ -101,10 +107,12 @@ void loop()
   {
     lastSerialPrint = millis();
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    Serial.printf("Heap: %d | Clients: %d | Recording: %s\n",
-                  ESP.getFreeHeap(),
-                  ws.count(),
-                  appState.dataRecording ? "yes" : "no");
+    LittleFS.info(fs_info);
+    Serial.printf("Heap: %d | Clients: %d | LittleFS free: %d KB | Recording: %s\n", 
+      ESP.getFreeHeap(), 
+      ws.count(),
+      (fs_info.totalBytes - fs_info.usedBytes) / 1024,
+      appState.dataRecording ? "yes" : "no");
   }
   yield();
   delay(DELAY);
@@ -148,7 +156,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
         file = LittleFS.open("data.csv", "w");
         if (file)
         {
-          file.print("Altitude; Pressure; Temp; RealData\n");
+          file.print("Altitude; Pressure; Temp\n");
           Serial.println("File opened");
         }
         else
@@ -288,7 +296,7 @@ void storeData(const SensorData &data, const ApplicationState &appState)
 {
   if (appState.dataRecording && file)
   {
-    if (!file.printf("%0.2f; %0.2f; %0.2f; %s\n", data.altitude, data.pressure, data.temperature, data.realData ? "true" : "false"))
+    if (!file.printf("%0.2f; %0.2f; %0.2f\n", data.altitude, data.pressure, data.temperature))
     {
       Serial.println("Write failed");
     }

@@ -13,7 +13,21 @@ Verwendete Bibliotheken:
 
 ## Upload des Programms auf einen neuen ESP
 
-Das Programm nutzt LittleFS um die index.html Datei auf dem ESP zu speichern. Über LittleFS können Dateien auf dem ESP abgelegt werden, ähnlich einem USB Stick. Wichtig hierbei ist, dass der Upload der Dateien **NICHT** beim Upload des Arduino Programms erfolgt. Der Upload der index.html Datei muss manuell angestoßen werden. 
+Das Programm nutzt LittleFS um die index.html Datei auf dem ESP zu speichern. Über LittleFS können Dateien auf dem ESP abgelegt werden, ähnlich einem USB Stick. Wichtig hierbei ist, dass der Upload der Dateien **NICHT** beim Upload des Arduino Programms erfolgt. Der Upload der index.html Datei muss manuell angestoßen werden.
+
+### Programm mit PlatformIO-CLI kompilieren
+
+Wenn man PlatformIO installiert hat, kann man über das Icon links bei VS Code in dem Menü unter Miscellaneous -> PlatformIO Core CLI das PlatformIO-Terminal aufrufen.
+
+So kann man das Projekt bauen:
+```bash
+pio run --target erase -e nodemcu     # Löscht Flash auf dem Device
+pio run --target clean -e nodemcu     # Löscht vorherige Builds
+pio run -e nodemcu                    # Baut für das Environment nodemcu
+pio run --target upload -e nodemcu    # Hochladen des Builds
+pio run --target uploadfs -e nodemcu  # Hochladen des Dateisystems (alles unter data)
+pio run device monitor -e nodemcu     # Verbindet sich mit dem Gerät und zeigt die Ausgaben
+```
 
 ### Wie Data-Folder mit PlatformIO hochladen
 
