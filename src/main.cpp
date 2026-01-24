@@ -5,6 +5,7 @@ bool bmpReadyStatus = false;
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
 DNSServer dnsServer;
+unsigned long lastSerialPrint = 0;
 
 File file;
 String index_html = "";
@@ -12,6 +13,7 @@ ApplicationState appState;
 
 void setup()
 {
+  pinMode(LED_BUILTIN, OUTPUT);
   setlocale(LC_ALL, "de_DE.UTF-8");
   Serial.begin(115200);
   Serial.setDebugOutput(true);
@@ -38,9 +40,21 @@ void setup()
 
 void loop()
 {
+  if (ESP.getFreeHeap() < 5000)
+  {
+    Serial.println("Low memory!!");
+    // ESP.restart();
+  }
+  yield();
   dnsServer.processNextRequest();
-
+  yield();
   ws.cleanupClients();
+  yield();
+  if (ws.count() == 0)
+  {
+    delay(500);
+    return;
+  }
   yield();
 
   SensorData data = {};
@@ -59,8 +73,18 @@ void loop()
   }
 
   sendDataToClient(data);
+  yield();
   storeData(data, appState);
-
+  yield();
+  if (millis() - lastSerialPrint > HEARTBEAT_INTERVALL)
+  {
+    lastSerialPrint = millis();
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    Serial.printf("Heap: %d | Clients: %d | Recording: %s\n",
+                  ESP.getFreeHeap(),
+                  ws.count(),
+                  appState.dataRecording ? "yes" : "no");
+  }
   yield();
   delay(DELAY);
 }

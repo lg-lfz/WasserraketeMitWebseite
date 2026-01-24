@@ -15,6 +15,7 @@
 
 #define SEALEVELPRESSURE_HPA 1013.25
 #define DELAY 100 // 10 times per second
+#define HEARTBEAT_INTERVALL 5000 //Console printout every 5000 ms
 
 struct SensorData
 {
