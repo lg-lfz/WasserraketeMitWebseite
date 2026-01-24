@@ -11,6 +11,20 @@ File file;
 String index_html = "";
 ApplicationState appState;
 
+#ifdef ARDUINO_ESP8266_NODEMCU_ESP12E
+  const char* BOARD_TYPE = "NodeMCU ESP-12E";
+#elif defined(ARDUINO_ESP8266_NODEMCU)
+  const char* BOARD_TYPE = "NodeMCU";
+#elif defined(ARDUINO_ESP8266_WEMOS_D1MINI)
+  const char* BOARD_TYPE = "D1 Mini";
+#elif defined(ARDUINO_ESP8266_WEMOS_D1MINIPRO)
+  const char* BOARD_TYPE = "D1 Mini Pro";
+#elif defined(ARDUINO_ESP8266_WEMOS_D1MINILITE)
+  const char* BOARD_TYPE = "D1 Mini Lite";
+#else
+  const char* BOARD_TYPE = "ESP8266";
+#endif
+
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
@@ -34,8 +48,15 @@ void setup()
   server.serveStatic("/10-10-10-10-qr-code.svg", LittleFS, "/10-10-10-10-qr-code.svg");
 
   initWebSocket();
-  // Start server
   server.begin();
+  yield();
+  Serial.println("------ Board Info ------");
+  Serial.printf("Board: %s\n", BOARD_TYPE);
+  Serial.printf("Chip ID: %08X\n", ESP.getChipId());
+  Serial.printf("Flash Size: %d KB\n", ESP.getFlashChipSize() / 1024);
+  Serial.printf("CPU Freq: %d MHz\n", ESP.getCpuFreqMHz());
+  Serial.printf("MAC: %s\n", WiFi.macAddress().c_str());
+  Serial.println("------------------------");
 }
 
 void loop()
@@ -211,6 +232,24 @@ String processor(const String &var)
   if (var == "MAC")
   {
     return WiFi.macAddress();
+  }
+  if (var == "BOARD")
+  {
+    return String(BOARD_TYPE);
+  }
+  if (var == "CHIP_ID")
+  {
+    char buf[16];
+    sprintf(buf, "%08X", ESP.getChipId());
+    return String(buf);
+  }
+  if (var == "FLASH_SIZE")
+  {
+    return String(ESP.getFlashChipSize() / 1024) + " KB";
+  }
+  if (var == "CPU_FREQ")
+  {
+    return String(ESP.getCpuFreqMHz()) + " MHz";
   }
   return String();
 }
