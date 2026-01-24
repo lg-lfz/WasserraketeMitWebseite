@@ -25,14 +25,12 @@ function onClose(event) {
 function onMessage(event) {
   const data = JSON.parse(event.data);
 
-  // Sensordaten updaten
   document.getElementById("temperature").innerHTML = data.temperature.toFixed(2);
   document.getElementById("altitude").innerHTML = data.altitude.toFixed(2);
   document.getElementById("pressure").innerHTML = data.pressure.toFixed(2);
   document.getElementById("realData").innerHTML = data.realData ? "BMP280" : "Fake";
   document.getElementById("clients").innerHTML = data.clients;
 
-  // Recording-State updaten
   const button = document.getElementById("Startbutton");
   const stateText = document.getElementById("state");
   const stateContainer = document.getElementById("stateContainer");
@@ -49,7 +47,6 @@ function onMessage(event) {
     stateText.innerHTML = "not recording...";
     stateContainer.classList.remove("recording");
 
-    // Download nur wenn ICH gestoppt habe
     if (myTogglePending && wasRecording) {
       myTogglePending = false;
       window.location.href = '/download';
@@ -62,6 +59,15 @@ function onMessage(event) {
 function onLoad(event) {
   initWebSocket();
   initButton();
+  
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+      if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+        console.log('Page visible again - reconnecting...');
+        initWebSocket();
+      }
+    }
+  });
 }
 
 function initButton() {
