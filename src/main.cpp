@@ -184,7 +184,6 @@ void onEvent(AsyncWebSocket *server, AsyncWebSocketClient *client, AwsEventType 
     break;
   case WS_EVT_PONG:
   case WS_EVT_ERROR:
-  case WS_EVT_PING:
     break;
   }
 }
@@ -263,7 +262,7 @@ String processor(const String &var)
 
 void sendDataToClient(const SensorData &data)
 {
-  if (ws.count() == 0 || ws.getClients().empty())
+  if (ws.count() == 0 || ws.getClients().isEmpty())
   {
     return;
   }
@@ -283,9 +282,9 @@ void sendDataToClient(const SensorData &data)
 
   for (auto &client : ws.getClients())
   {
-    if (client.status() == WS_CONNECTED && client.canSend())
+    if (client->status() == WS_CONNECTED && client->canSend())
     {
-      client.text(buffer, len);
+      client->text(buffer, len);
       yield();
     }
   }
