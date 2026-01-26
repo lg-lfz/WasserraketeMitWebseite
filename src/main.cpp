@@ -77,6 +77,18 @@ void loop()
   yield();
   ws.cleanupClients();
   yield();
+  if (millis() - lastSerialPrint > HEARTBEAT_INTERVALL)
+  {
+    lastSerialPrint = millis();
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    LittleFS.info(fs_info);
+    Serial.printf("Heap: %d | Clients: %d | LittleFS free: %d KB | Recording: %s\n", 
+      ESP.getFreeHeap(), 
+      ws.count(),
+      (fs_info.totalBytes - fs_info.usedBytes) / 1024,
+      appState.dataRecording ? "yes" : "no");
+  }
+  yield();
   if (ws.count() == 0)
   {
     delay(500);
@@ -102,19 +114,6 @@ void loop()
   sendDataToClient(data);
   yield();
   storeData(data, appState);
-  yield();
-  if (millis() - lastSerialPrint > HEARTBEAT_INTERVALL)
-  {
-    lastSerialPrint = millis();
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    LittleFS.info(fs_info);
-    Serial.printf("Heap: %d | Clients: %d | LittleFS free: %d KB | Recording: %s\n", 
-      ESP.getFreeHeap(), 
-      ws.count(),
-      (fs_info.totalBytes - fs_info.usedBytes) / 1024,
-      appState.dataRecording ? "yes" : "no");
-  }
-  yield();
   delay(DELAY);
 }
 
