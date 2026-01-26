@@ -154,7 +154,7 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
       }
       else
       {
-        file = LittleFS.open("data.csv", "w");
+        file = LittleFS.open("/data.csv", "w");
         if (file)
         {
           file.print("Altitude; Pressure; Temp\n");
@@ -228,7 +228,7 @@ void initWebSocket()
       {
         file.close();
       }
-      request->send(LittleFS, "data.csv", String(), true); });
+      request->send(LittleFS, "/data.csv", String(), true); });
 
   // Catch-All: Redirect all unknown requests to homepage
   server.onNotFound([](AsyncWebServerRequest *request)
