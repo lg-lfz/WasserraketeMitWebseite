@@ -9,7 +9,6 @@ unsigned long lastSerialPrint = 0;
 FSInfo fs_info;
 
 File file;
-String index_html = "";
 ApplicationState appState;
 
 #ifdef ARDUINO_ESP8266_NODEMCU_ESP12E
@@ -29,7 +28,6 @@ ApplicationState appState;
 void setup()
 {
   pinMode(LED_BUILTIN, OUTPUT);
-  setlocale(LC_ALL, "de_DE.UTF-8");
   Serial.begin(115200);
   Serial.setDebugOutput(true);
 
@@ -115,21 +113,6 @@ void loop()
   yield();
   storeData(data, appState);
   delay(DELAY);
-}
-
-void loadHTMLPage(String fileName)
-{
-  File htmlFile = LittleFS.open(fileName, "r");
-
-  if (htmlFile)
-  {
-    index_html = htmlFile.readString();
-    htmlFile.close();
-  }
-  else
-  {
-    Serial.println("Reading the HTML file failed...");
-  }
 }
 
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len)
