@@ -296,7 +296,7 @@ void initAccessPoint(const IPAddress &localIP, const IPAddress &gatewayIP, const
   Serial.println(WiFi.softAPIP());
   WiFi.softAP(ssid);
 
-  // Start DNS server - redirects all domain requests to the ESP32
+  // Start DNS server - redirects all domain requests to the ESP8266
   dnsServer.start(53, "*", localIP);
   Serial.println("DNS server started");
 }
