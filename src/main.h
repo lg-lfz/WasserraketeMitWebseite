@@ -26,7 +26,7 @@ struct SensorData
 
 struct ApplicationState
 {
-  bool dataRecording;
+  bool dataRecording = false;
 };
 
 void initWebSocket();
